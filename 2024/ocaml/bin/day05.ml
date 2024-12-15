@@ -1,4 +1,4 @@
-let rec is_rule_ok x y rules =
+let is_rule_ok x y rules =
     let res = ref false in
     Hashtbl.find_all rules x 
     |> List.iter (fun child -> 
