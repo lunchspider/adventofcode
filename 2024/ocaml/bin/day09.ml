@@ -62,20 +62,6 @@ let make_compact arr =
     inner 0 (Array.length arr - 1)
 
     
-let rec find_next_block arr last =
-    let rec aux n l =
-        if arr.(n) <> arr.(n + 1) then
-          (n + 1, l)
-        else
-          aux (n - 1) (l + 1)
-    in
-
-    if arr.(last) <> -1 then
-    aux (last - 1) 1
-    else
-    find_next_block arr (last - 1)
-
-
 let find_space arr len =
     let start = ref 0 in
     let i = ref 0 in
