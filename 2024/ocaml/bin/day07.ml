@@ -2,7 +2,7 @@ module Operation = struct
     type t = { 
         result: int;
         inputs: int Array.t
-    }[@@deriving field]
+    }[@@deriving fields]
 
     let create result inputs = 
         { result = result; inputs = inputs }
