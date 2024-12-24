@@ -40,17 +40,17 @@ let get_regions map =
     let res = Dynarray.create() in
     for i = 0 to rows - 1 do
         for j = 0 to cols - 1 do
-            let point = { x = i; y = j} in
-            let arr  = Dynarray.create() in
+            let point = { x = i; y = j } in
             if not (CoordSet.mem point !visited) then
             (
+                let arr  = Dynarray.create() in
                 dfs map.(i).[j] arr point;
                 Dynarray.add_last res arr;
             )
         done;
     done;
 
-    (res, rows, cols)
+    res
 
 let count_sides region =
     let set = CoordSet.of_seq @@ Dynarray.to_seq region in
@@ -108,7 +108,7 @@ let parse channel =
     lines
 
 let first filename =
-    let (regions, rows, cols) = open_in filename 
+    let regions = open_in filename 
         |> parse 
         |> get_regions
     in
@@ -119,7 +119,7 @@ let first filename =
     ()
 
 let second filename =
-    let (regions, rows, cols) = open_in filename 
+    let regions = open_in filename 
         |> parse 
         |> get_regions
     in
