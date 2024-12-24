@@ -31,14 +31,11 @@ module Machine = struct
         (m, n)
 
     let is_solution_correct (m, n) =
-        if m < 0. 
+         (m < 0. 
             || n < 0. 
             || (Float.round (m *. 100.) |> int_of_float) mod 100 != 0
-            || (Float.round (n *. 100.) |> int_of_float) mod 100 != 0 
-        then
-            false
-        else
-            true
+            || (Float.round (n *. 100.) |> int_of_float) mod 100 != 0)
+        |> not
 
     let add_to_prize v t =
         t.prize.x <- t.prize.x + v;
