@@ -1,19 +1,9 @@
-type point = { mutable x:int; mutable y: int }
-
-module CoordSet = Set.Make (struct
-  type t = point
-
-  let compare a b = 
-    let cmp_x = Int.compare a.x b.x in
-    if  cmp_x <> 0 then cmp_x
-    else Int.compare a.y b.y
-end)
-
+open Advent
 
 module Robot = struct
     type t = {
-        pos: point;
-        velocity: point;
+        mutable pos: Advent.point;
+        velocity: Advent.point;
     }
 
     let get_pos self =
@@ -65,8 +55,10 @@ module State = struct
                 ()
             else
             (
-                state.robots.(i).pos.y <- (state.robots.(i).pos.y + steps * state.robots.(i).velocity.y) mod state.height;
-                state.robots.(i).pos.x <- (state.robots.(i).pos.x + steps * state.robots.(i).velocity.x) mod state.width;
+                let y = (state.robots.(i).pos.y + steps * state.robots.(i).velocity.y) mod state.height 
+                and x = (state.robots.(i).pos.x + steps * state.robots.(i).velocity.x) mod state.width
+                in
+                state.robots.(i).pos <- { x = x; y = y};
                 aux (i + 1)
             )
         in 

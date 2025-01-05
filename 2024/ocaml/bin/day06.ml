@@ -1,34 +1,5 @@
-module Direction = struct
-    type dir = Up | Down | Left | Right
-
-    let of_char d = match d with
-        | '^' -> Up
-        | '>' -> Right
-        | '<' -> Left
-        | 'v' -> Down
-        | _ -> assert false
-
-    let to_string d = match d with
-        | Up -> "^"
-        | Down -> "v"
-        | Right -> ">"
-        | Left -> "<"
-
-    let turn_right d = match d with
-        | Up -> Right
-        | Right -> Down
-        | Down -> Left
-        | Left -> Up
-
-    let to_di d = match d with
-        | Up -> (-1, 0)
-        | Down -> (1, 0)
-        | Right -> (0, 1)
-        | Left -> (0, -1)
-end
-
 module Board = struct 
-
+    open Advent
     type tile = 
         | Obstacle 
         | Empty
@@ -67,12 +38,14 @@ module Board = struct
             if i == rows then
                 ()
             else
-                if j == cols then
-                    (Printf.printf "\n";
-                    print_inner (i + 1) 0)
-                else
-                    (Printf.printf "%s" @@ to_string map.(i).(j);
-                    print_inner i (j + 1))
+                if j == cols then begin
+                    Printf.printf "\n";
+                    print_inner (i + 1) 0
+                end
+                else begin
+                    Printf.printf "%s" @@ to_string map.(i).(j);
+                    print_inner i (j + 1)
+                end
         in
         print_inner 0 0 
         
@@ -81,19 +54,19 @@ end
 let count_position map start_x start_y dir = 
     let rows = Array.length map and cols = Array.length map.(0) in
     let rec count_inner i j dir =
-        let (di, dy) = Direction.to_di dir in
+        let d = Advent.Direction.to_di dir in
         if i < 0 || j < 0 || i >= rows || j >= cols then
             0
         else
             match map.(i).(j) with
                 | Board.Obstacle ->
                     (*go back and turn right*)
-                    count_inner (i - di) (j - dy) (Direction.turn_right dir)
+                    count_inner (i - d.x) (j - d.y) (Advent.Direction.turn_right dir)
                 | Board.Empty ->
                     map.(i).(j) <- Board.Visited(dir);
-                    1 + count_inner (i + di) (dy + j) dir
+                    1 + count_inner (i + d.x) (d.y + j) dir
                 | Board.Visited(_) ->
-                    count_inner (i + di) (dy + j) dir
+                    count_inner (i + d.x) (d.y + j) dir
                 | _ -> assert false
     in
     count_inner start_x start_y dir
@@ -119,7 +92,7 @@ let count_loops_locations map start_x start_y dir =
 *)
 
     let rec is_looping i j dir visited =
-        let (dx, dy) = Direction.to_di dir in
+        let d = Advent.Direction.to_di dir in
         if i < 0 || j < 0 || i >= rows || j >= cols then
             0
         else
@@ -128,9 +101,9 @@ let count_loops_locations map start_x start_y dir =
             else
                 match map.(i).(j) with
                     | Board.Obstacle ->
-                        is_looping (i - dx) (j - dy) (Direction.turn_right dir) visited
+                        is_looping (i - d.x) (j - d.y) (Advent.Direction.turn_right dir) visited
                     | Board.Empty -> 
-                        is_looping (i + dx) (j + dy) (dir) (visited + 1)
+                        is_looping (i + d.x) (j + d.y) (dir) (visited + 1)
                     | _ -> assert false
     in
 
@@ -145,20 +118,18 @@ let count_loops_locations map start_x start_y dir =
                     | Board.Obstacle ->
                         put_obstacle i (j + 1)
                     | Board.Empty ->
-                        if i == start_x && j == start_y then
-                        (
+                        if i == start_x && j == start_y then begin
                             let is_loop = is_looping start_x start_y dir 0 in
                             res := !res + is_loop;
-                            put_obstacle i (j + 1)
-                        )
-                        else
-                        (
+                            put_obstacle i (j + 1) 
+                        end
+                        else begin
                             map.(i).(j) <- Board.Obstacle;
                             let is_loop = is_looping start_x start_y dir 0 in
                             map.(i).(j) <- Board.Empty;
                             res := !res + is_loop;
                             put_obstacle i (j + 1)
-                        )
+                        end
                     | _ -> assert false
     in
     let _ = put_obstacle 0 0 in
